@@ -5,6 +5,7 @@ The only deployable service in this repository is the Next.js app in `frontend/`
 ## 1. Database
 
 - Set `BOOKING_DATABASE_URL` in Vercel Production to the PostgreSQL connection string used by the app.
+- Download the Supabase database root certificate and set `BOOKING_DATABASE_CA_BASE64` in Vercel Production to the Base64-encoded PEM certificate. Production database connections verify this CA.
 - In the intended Supabase project, run these migrations in order if they have not already been applied:
   1. `frontend/db/migrations/001_customer_requests.sql`
   2. `frontend/db/migrations/002_booking_notification_jobs.sql`
