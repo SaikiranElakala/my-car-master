@@ -16,6 +16,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2 text-sm text-white/70">
               {client.phone && <li><a href={phoneHref(client.phone)} className="transition-colors hover:text-amber">{formatContactPhone(client.phone)}</a></li>}
               {client.secondaryPhone && <li><a href={phoneHref(client.secondaryPhone)} className="transition-colors hover:text-amber">{formatContactPhone(client.secondaryPhone)}</a></li>}
+              {client.additionalPhone && <li><a href={phoneHref(client.additionalPhone)} className="transition-colors hover:text-amber">{formatContactPhone(client.additionalPhone)}</a></li>}
               {client.email && <li><a href={`mailto:${client.email}`} className="transition-colors hover:text-amber">{client.email}</a></li>}
               {client.address && <li>{client.address}</li>}
               {client.businessHours && <li>{client.businessHours}</li>}

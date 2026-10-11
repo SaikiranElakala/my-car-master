@@ -9,6 +9,7 @@ export const client = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://mycarmaster.in",
   phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || null,
   secondaryPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE_SECONDARY || null,
+  additionalPhone: "+91 9030969859",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || null,
   address: null as string | null, // COMPANY_ADDRESS
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || null,
