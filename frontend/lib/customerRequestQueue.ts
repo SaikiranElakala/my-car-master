@@ -175,8 +175,9 @@ async function deliverOne(requestId?: string) {
     }
 
     const apiKey = process.env.RESEND_API_KEY;
-    const sender = process.env.BOOKING_FROM_EMAIL;
-    const recipient = process.env.BOOKING_TO_EMAIL;
+    // Keep enquiry delivery compatible with the variables used by booking emails.
+    const sender = process.env.EMAIL_FROM || process.env.BOOKING_FROM_EMAIL;
+    const recipient = process.env.BOOKING_TO_EMAIL || process.env.BOOKING_NOTIFICATION_EMAIL;
     let sent = false;
     let failureStatus = "configuration_error";
 
