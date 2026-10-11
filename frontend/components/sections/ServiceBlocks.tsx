@@ -15,7 +15,7 @@ export function TextSplit({ title, children, tone = "light" }: { title: string; 
 }
 
 export function UsedCarEvaluationPricing() {
-  return <InspectionPricingCards title="Used Car Evaluation" description="A pre-purchase inspection to help you understand the vehicle's condition before you decide to buy." prices={[{ segment: "Hatchback & Sedan", price: 499 }, { segment: "SUV", price: 799 }, { segment: "Premium", price: 1299 }]} bookingHref="/booking?service=used-car-inspection" />;
+  return <InspectionPricingCards title="Used Car Evaluation" description="A pre-purchase inspection to help you understand the vehicle's condition before you decide to buy." prices={[{ segment: "Hatchback & Sedan", price: 799 }, { segment: "SUV", price: 999 }, { segment: "Premium", price: 1299 }]} bookingHref="/booking?service=used-car-inspection" />;
 }
 
 export function NewCarPdiPricing() {

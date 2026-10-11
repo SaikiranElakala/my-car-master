@@ -25,9 +25,9 @@ export default function Page() {
       <section className="bg-paper py-16 md:py-24">
         <div className="container-x">
           <div className="mx-auto max-w-5xl">
-            <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+            <div className="grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
               <article className="relative min-h-[420px] overflow-hidden rounded-3xl bg-ink text-white shadow-soft sm:min-h-[480px]">
-                <Image src="/images/cars/founder.jpg.png" alt="Kakarla Chiranjeevi, founder of My Car Master" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw" className="object-cover object-[38%_center]" />
+                <Image src="/images/cars/foundermycarmaster.jpg" alt="Kakarla Chiranjeevi, founder of My Car Master" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-[38%_center]" />
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/5" />
                 <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 sm:p-6">
                   <p className="rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm">Founder</p>
@@ -44,7 +44,7 @@ export default function Page() {
               </article>
 
               <article className="relative min-h-[420px] overflow-hidden rounded-3xl bg-ink text-white shadow-soft sm:min-h-[480px]">
-                <Image src="/images/cars/cofounder.jpg" alt="M Santosh Kumar, Co-Founder and Managing Partner of My Car Master" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw" className="object-cover object-[center_35%]" />
+                <Image src="/images/cars/cofounder.jpeg" alt="M Santosh Kumar, Co-Founder and Managing Partner of My Car Master" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-[center_35%]" />
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/5" />
                 <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 sm:p-6">
                   <p className="rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm">Leadership</p>
@@ -59,12 +59,29 @@ export default function Page() {
                   <p className="mt-3 text-sm font-medium text-white/85">Co-Founder &amp; Managing Partner</p>
                 </div>
               </article>
+
+              <article className="relative min-h-[420px] overflow-hidden rounded-3xl bg-ink text-white shadow-soft sm:min-h-[480px]">
+                <Image src="/images/cars/managingpartner.jpg" alt="Bathina Prem Kumar, Managing Partner of My Car Master" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-[center_30%]" />
+                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/5" />
+                <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 sm:p-6">
+                  <p className="rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm">Leadership</p>
+                  <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-amber shadow-[0_0_18px_rgba(225,29,72,0.8)]" />
+                </div>
+                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                  <h2 className="display text-3xl leading-[0.98] sm:text-4xl">
+                    <span className="block">Bathina</span>
+                    <span className="mt-1 block text-amber">Prem Kumar</span>
+                  </h2>
+                  <div className="mt-4 h-px w-16 bg-amber" />
+                  <p className="mt-3 text-sm font-medium text-white/85">Managing Partner, My Car Master</p>
+                </div>
+              </article>
             </div>
 
             <div className="mt-8 flex flex-col justify-center rounded-3xl border border-line bg-white p-7 shadow-soft sm:p-9">
               <p className="eyebrow text-amber">Our story</p>
               <h2 className="display mt-3 text-3xl sm:text-4xl">One place for practical car support.</h2>
-              <p className="mt-5 text-base leading-7 text-steel">Founded by Kakarla Chiranjeevi, with M Santosh Kumar as Co-Founder and Managing Partner, My Car Master brings vehicle inspections and related automotive service enquiries together in one place.</p>
+              <p className="mt-5 text-base leading-7 text-steel">Founded by Kakarla Chiranjeevi, with M Santosh Kumar and Bathina Prem Kumar as Managing Partners, My Car Master brings vehicle inspections and related automotive service enquiries together in one place.</p>
               <p className="mt-3 text-base leading-7 text-steel">Customers can share their vehicle, location and preferred date through the website. The team follows up to review the request and confirm service availability and next steps.</p>
             </div>
           </div>
