@@ -53,7 +53,7 @@ export function Navbar() {
   }, [citiesModalOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 md:px-6">
+    <header className="fixed inset-x-0 top-0 z-50 flex flex-col items-center px-3 pt-3 md:px-6">
       <nav
         aria-label="Main"
         className={cn(
@@ -130,11 +130,8 @@ export function Navbar() {
           >
             <MessageCircle className="h-4 w-4" /> {client.whatsappNumber ? "WhatsApp" : "Contact"}
           </a>
-          <div className="hidden flex-col items-center gap-0.5 md:flex">
+          <div className="hidden shrink-0 md:flex">
             <Button href="/inspection-type" onClick={() => track("book_now_click")} className="!min-h-[42px] !px-5">Request Inspection</Button>
-            <a href="mailto:hello@mycarmaster.in" className={cn("whitespace-nowrap text-[9px] leading-3 underline underline-offset-2", scrolled ? "text-ink/70 hover:text-amber" : "text-white/75 hover:text-white")}>
-              For your services, email hello@mycarmaster.in
-            </a>
           </div>
           <button
             type="button"
@@ -147,6 +144,18 @@ export function Navbar() {
           </button>
         </div>
       </nav>
+
+      <div className="hidden w-full max-w-[1280px] justify-end px-4 pt-1 md:flex md:px-5">
+        <a
+          href="mailto:hello@mycarmaster.in"
+          className={cn(
+            "rounded-full border px-3 py-1.5 text-xs shadow-sm backdrop-blur-xl transition-colors",
+            scrolled ? "border-line bg-paper/95 text-ink/75 hover:text-amber" : "border-white/20 bg-ink/55 text-white/85 hover:text-white"
+          )}
+        >
+          For services, email hello@mycarmaster.in
+        </a>
+      </div>
 
       {open && (
         <div className="fixed inset-0 top-0 z-[-1] bg-ink px-6 pt-28 text-white xl:hidden">
