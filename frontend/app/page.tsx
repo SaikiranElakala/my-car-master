@@ -12,11 +12,43 @@ import { faqs } from "@/services/content";
 import { testimonials } from "@/config/client";
 import { VehicleInspectionNote } from "@/components/home/VehicleInspectionNote";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = {
+  title: "Used Car Inspection, New Car PDI & Vehicle Services",
+  description:
+    "Check your car before you buy. Avoid mistakes with a complete inspection and report that helps you understand your future car before making a decision. My Car Master.",
+  alternates: { canonical: "/" },
+};
+
+const homeStructuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://mycarmaster.in/#organization",
+      name: "My Car Master",
+      url: "https://mycarmaster.in/",
+      logo: "https://mycarmaster.in/images/cars/webfrontpage.webp",
+      description:
+        "Check your car before you buy. Get a complete inspection and report to understand your future car before making a decision.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://mycarmaster.in/#website",
+      name: "My Car Master",
+      url: "https://mycarmaster.in/",
+      publisher: { "@id": "https://mycarmaster.in/#organization" },
+      inLanguage: "en-IN",
+    },
+  ],
+};
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeStructuredData) }}
+      />
       <Hero />
       <VehicleInspectionNote />
       <ServicesOverview />

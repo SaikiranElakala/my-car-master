@@ -11,7 +11,7 @@ import { client } from "@/config/client";
 
 export const metadata: Metadata = {
   metadataBase: new URL(client.siteUrl),
-  title: { default: "My Car Master — Used Car Evaluation & New Car PDI", template: "%s | My Car Master" },
+  title: { default: "My Car Master | Used Car Inspection & New Car PDI", template: "%s | My Car Master" },
   description:
     "My Car Master offers used car evaluation, new car PDI, roadside assistance, used car finance and car insurance enquiries.",
   openGraph: {
