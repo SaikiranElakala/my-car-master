@@ -13,7 +13,7 @@ import { PrivacyPolicyDialog } from "@/components/legal/PrivacyPolicyDialog";
 import { TermsAndConditionsDialog } from "@/components/legal/TermsAndConditionsDialog";
 
 const steps = ["Brand", "Model", "Booking details"] as const;
-type BookingConfirmation = { service: string; preferredDate: string; city: string; area: string; vehicleType: string; vehicle: string };
+type BookingConfirmation = { service: string; email: string; emailSent: boolean; preferredDate: string; city: string; area: string; vehicleType: string; vehicle: string };
 const todayLocal = () => {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
@@ -170,6 +170,7 @@ export function VehicleSelector({ tone = "light" }: { tone?: "light" | "dark" })
         body: JSON.stringify({
           name: form.get("name"),
           phone: form.get("phone"),
+          email: form.get("email"),
           city: selectedCity,
           area: selectedArea === "Other" ? customArea : selectedArea,
           vehicleType: form.get("vehicleType"),
@@ -185,6 +186,8 @@ export function VehicleSelector({ tone = "light" }: { tone?: "light" | "dark" })
       setRequestReference(typeof result.reference === "string" ? result.reference : "");
       setBookingConfirmation({
         service: String(form.get("service") ?? selectedService),
+        email: String(form.get("email") ?? ""),
+        emailSent: result.customerEmailSent === true,
         preferredDate: String(form.get("preferredDate") ?? preferredDate),
         city: selectedCity,
         area: selectedArea === "Other" ? customArea : selectedArea,
@@ -321,7 +324,7 @@ export function VehicleSelector({ tone = "light" }: { tone?: "light" | "dark" })
               <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-emerald-700 ring-4 ring-emerald-50"><CheckCircle2 className="h-7 w-7" aria-hidden="true" /></div>
               <div className="mt-3 text-center">
                 <h3 className={cn("font-display text-3xl sm:text-4xl", dark ? "text-white" : "text-ink")}>Request <span className="text-amber">Received!</span></h3>
-                <p className={cn("mx-auto mt-2 max-w-xl text-sm leading-5", dark ? "text-white/70" : "text-steel")}>Your booking request has been received. Our team will contact you to confirm your inspection.</p>
+                <p className={cn("mx-auto mt-2 max-w-xl text-sm leading-5", dark ? "text-white/70" : "text-steel")}>{bookingConfirmation?.emailSent ? `Your ${bookingConfirmation.service} request was received, and a confirmation email was sent to ${bookingConfirmation.email}.` : `Your ${bookingConfirmation?.service ?? "service"} request was received. Our team will reach out shortly; the confirmation email is queued for delivery.`}</p>
               </div>
 
               {bookingConfirmation && <div className={cn("mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-3 sm:items-center", dark ? "border-white/10 bg-white/[0.03]" : "border-line bg-paper/60")}>
@@ -364,6 +367,9 @@ export function VehicleSelector({ tone = "light" }: { tone?: "light" | "dark" })
             </label>
             <label className="text-sm font-semibold">Mobile Number <span className="text-red-500">*</span>
               <input required name="phone" type="tel" inputMode="numeric" autoComplete="tel" pattern="[0-9+()\s-]{8,15}" placeholder="Enter your mobile number" className="mt-2 min-h-[52px] w-full rounded-xl border border-line bg-paper px-4 font-normal text-ink outline-none transition focus:border-amber focus:ring-2 focus:ring-amber/15" />
+            </label>
+            <label className="text-sm font-semibold">Email Address <span className="text-red-500">*</span>
+              <input required name="email" type="email" autoComplete="email" maxLength={254} placeholder="Enter your email address" className="mt-2 min-h-[52px] w-full rounded-xl border border-line bg-paper px-4 font-normal text-ink outline-none transition focus:border-amber focus:ring-2 focus:ring-amber/15" />
             </label>
             <label className="text-sm font-semibold">Select City <span className="text-red-500">*</span>
               <select required value={selectedCity} onChange={(event) => { setSelectedCity(event.target.value); setSelectedArea(""); setCustomArea(""); }} className="mt-2 min-h-[52px] w-full rounded-xl border border-line bg-paper px-4 font-normal text-ink outline-none transition focus:border-amber focus:ring-2 focus:ring-amber/15">

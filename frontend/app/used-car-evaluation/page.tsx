@@ -24,7 +24,7 @@ const serviceHighlights = [
 export default function Page() {
   return (
     <>
-      <section className="relative isolate flex min-h-[calc(100svh-6rem)] items-center overflow-hidden bg-ink bg-cover bg-center py-28 text-white md:py-36" style={{ backgroundImage: "url('/images/services/used-car-inspection.webp')" }}>
+      <section className="relative isolate flex min-h-[620px] items-center overflow-hidden bg-ink bg-cover bg-center py-16 text-white md:min-h-[680px] md:py-24" style={{ backgroundImage: "url('/images/services/used-car-inspection.webp')" }}>
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/10" />
         <div className="container-x relative z-10">
           <div className="mb-5"><BackButton href="/" className="!mb-0 text-white/80 hover:text-white" /></div>

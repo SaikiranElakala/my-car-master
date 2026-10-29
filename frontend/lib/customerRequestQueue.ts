@@ -1,5 +1,6 @@
 import { bookingPool } from "@/lib/bookingDb";
 import { createBookingRequestPdf } from "@/lib/bookingRequestPdf";
+import { client, formatContactPhone } from "@/config/client";
 
 type CustomerRequest = {
   id: string;
@@ -12,10 +13,12 @@ type CustomerRequest = {
 
 type BookingNotification = {
   id: string;
-  channel: "email" | "whatsapp";
+  channel: "email" | "whatsapp" | "customer_email";
   attempts: number;
   customer_name: string;
   phone: string;
+  customer_email: string;
+  request_type: string;
   details: Record<string, string>;
   created_at: Date;
 };
@@ -25,20 +28,27 @@ export async function saveCustomerRequest(request: {
   type: "booking" | "roadside" | "finance" | "insurance" | "contact";
   name: string;
   phone: string;
+  email: string;
   details: Record<string, string>;
 }) {
   const connection = await bookingPool().connect();
   try {
     await connection.query("BEGIN");
     await connection.query(
-    `INSERT INTO customer_requests (id, request_type, customer_name, phone, details)
-     VALUES ($1, $2, $3, $4, $5::jsonb)`,
-    [request.id, request.type, request.name, request.phone, JSON.stringify(request.details)],
+    `INSERT INTO customer_requests (id, request_type, customer_name, phone, customer_email, details)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb)`,
+    [request.id, request.type, request.name, request.phone, request.email, JSON.stringify(request.details)],
     );
     if (request.type === "booking") {
       await connection.query(
         `INSERT INTO booking_notification_jobs (request_id, channel)
-         VALUES ($1, 'email'), ($1, 'whatsapp') ON CONFLICT (request_id, channel) DO NOTHING`,
+         VALUES ($1, 'email'), ($1, 'customer_email') ON CONFLICT (request_id, channel) DO NOTHING`,
+        [request.id],
+      );
+    } else {
+      await connection.query(
+        `INSERT INTO booking_notification_jobs (request_id, channel)
+         VALUES ($1, 'customer_email') ON CONFLICT (request_id, channel) DO NOTHING`,
         [request.id],
       );
     }
@@ -55,6 +65,69 @@ function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
 }
 
+function customerConfirmationEmail(name: string, service: string, reference: string) {
+  const siteUrl = `https://${client.domain}`;
+  const contactPhone = client.phone || client.secondaryPhone || client.whatsappNumber || client.additionalPhone;
+  const displayPhone = formatContactPhone(contactPhone) || contactPhone;
+  const dialPhone = contactPhone.replace(/[^+\d]/g, "");
+  const text = [
+    `Hi ${name},`,
+    "",
+    "YOUR REQUEST IS IN GOOD HANDS",
+    `We received your ${service} request successfully. Our team will reach out to you shortly.`,
+    "",
+    `Service: ${service}`,
+    `Request reference: ${reference}`,
+    "",
+    "This email confirms receipt of your request; it does not confirm an appointment or service availability.",
+    "",
+    `Questions? Call us at ${displayPhone} or visit ${siteUrl}.`,
+    "",
+    "My Car Master",
+  ].join("\n");
+  const html = `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:#f3f1ed;font-family:Arial,Helvetica,sans-serif;color:#202124;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f1ed;padding:28px 12px;">
+      <tr><td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;">
+          <tr><td style="padding:22px 32px;border-bottom:1px solid #eee9e2;">
+            <a href="${siteUrl}" style="text-decoration:none;"><img src="${siteUrl}/images/brand/my-car-master-logo.png" width="230" alt="My Car Master" style="display:block;width:230px;max-width:100%;height:auto;border:0;"></a>
+          </td></tr>
+          <tr><td style="height:6px;background:#ed174c;font-size:0;line-height:0;">&nbsp;</td></tr>
+          <tr><td style="padding:34px 32px 14px;">
+            <span style="display:inline-block;padding:7px 11px;border-radius:20px;background:#fff1e6;color:#a94300;font-size:11px;font-weight:700;letter-spacing:1px;">SERVICE REQUEST RECEIVED</span>
+            <h1 style="margin:18px 0 10px;font-size:28px;line-height:1.25;color:#17191d;">We’re on it, ${escapeHtml(name)}.</h1>
+            <p style="margin:0;font-size:16px;line-height:1.65;color:#545963;">Thanks for choosing My Car Master. Our team has received your request and will reach out to you shortly.</p>
+          </td></tr>
+          <tr><td style="padding:16px 32px 8px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8f6f2;border:1px solid #eee8df;border-radius:14px;">
+              <tr><td style="padding:20px 22px;">
+                <p style="margin:0 0 7px;color:#737780;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Your selected service</p>
+                <p style="margin:0;color:#17191d;font-size:19px;font-weight:700;line-height:1.4;">${escapeHtml(service)}</p>
+                <p style="margin:16px 0 5px;color:#737780;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Request reference</p>
+                <p style="margin:0;color:#30343a;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;word-break:break-all;">${escapeHtml(reference)}</p>
+              </td></tr>
+            </table>
+          </td></tr>
+          <tr><td style="padding:18px 32px 28px;">
+            <p style="margin:0;color:#777c84;font-size:12px;line-height:1.6;">This confirms we received your request. Your appointment and service availability will be confirmed by our team separately.</p>
+          </td></tr>
+          <tr><td style="padding:24px 32px;background:#17191d;color:#ffffff;">
+            <p style="margin:0 0 8px;color:#ffffff;font-size:15px;font-weight:700;">Need help? We’re easy to reach.</p>
+            <p style="margin:0 0 16px;color:#d5d6d8;font-size:13px;line-height:1.6;">Call our team or visit our website for more information.</p>
+            <a href="tel:${dialPhone}" style="display:inline-block;padding:12px 18px;border-radius:24px;background:#ed174c;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">Call ${escapeHtml(displayPhone)}</a>
+            <p style="margin:18px 0 0;font-size:12px;"><a href="${siteUrl}" style="color:#ffc080;text-decoration:none;">mycarmaster.in</a></p>
+          </td></tr>
+          <tr><td style="padding:18px 32px;text-align:center;color:#8a8d93;font-size:11px;line-height:1.5;">© My Car Master · Inspect. Evaluate. Drive with Confidence.</td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
+  return { text, html };
+}
+
 function resendErrorCode(status: number, data: unknown) {
   const name = data && typeof data === "object" && "name" in data && typeof data.name === "string"
     ? data.name.toLowerCase().replace(/[^a-z0-9_]+/g, "_").slice(0, 48)
@@ -67,7 +140,7 @@ async function deliverBookingNotification(requestId?: string, channel?: BookingN
   try {
     await connection.query("BEGIN");
     const result = await connection.query<BookingNotification>(
-      `SELECT j.request_id AS id, j.channel, j.attempts, r.customer_name, r.phone, r.details, r.created_at
+      `SELECT j.request_id AS id, j.channel, j.attempts, r.customer_name, r.phone, r.customer_email, r.request_type, r.details, r.created_at
        FROM booking_notification_jobs j JOIN customer_requests r ON r.id = j.request_id
        WHERE j.status = 'pending' AND j.next_attempt_at <= NOW() AND j.attempts < $1
          AND ($2::uuid IS NULL OR j.request_id = $2::uuid)
@@ -80,6 +153,12 @@ async function deliverBookingNotification(requestId?: string, channel?: BookingN
 
     const d = job.details;
     const reference = job.id;
+    const service = d.service || d.serviceName || (job.request_type === "roadside"
+      ? `Roadside Assistance${d.type ? ` - ${d.type}` : ""}`
+      : job.request_type === "finance" ? "Used Car Finance"
+      : job.request_type === "insurance" ? `Car Insurance${d.type ? ` - ${d.type}` : ""}`
+      : job.request_type === "booking" ? "Service"
+      : "Customer enquiry");
     const fields = [
       ["Booking reference", reference], ["Service", d.service], ["Customer", job.customer_name],
       ["Phone", job.phone], ["Vehicle", [d.brand, d.model, d.vehicleType].filter(Boolean).join(" ")],
@@ -97,7 +176,23 @@ async function deliverBookingNotification(requestId?: string, channel?: BookingN
     let messageId: string | null = null;
     let errorCode = "configuration_error";
     try {
-      if (job.channel === "email" && apiKey && sender && recipient) {
+      if (job.channel === "customer_email" && apiKey && sender && job.customer_email) {
+        const confirmation = customerConfirmationEmail(job.customer_name, service, reference);
+        const response = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": `customer-confirmation-${reference}` },
+          body: JSON.stringify({
+            from: sender,
+            to: [job.customer_email],
+            subject: `We received your ${service} request - My Car Master`,
+            text: confirmation.text,
+            html: confirmation.html,
+          }),
+          signal: AbortSignal.timeout(8_000),
+        });
+        const data = await response.json().catch(() => ({}));
+        sent = response.ok; messageId = typeof data.id === "string" ? data.id : null; errorCode = response.ok ? "" : resendErrorCode(response.status, data);
+      } else if (job.channel === "email" && apiKey && sender && recipient) {
         const pdf = createBookingRequestPdf({
           id: reference,
           customerName: job.customer_name,
@@ -142,8 +237,12 @@ export async function tryBookingEmailNow(id: string) {
   return deliverBookingNotification(id, "email");
 }
 
+export async function tryCustomerConfirmationEmailNow(id: string) {
+  return deliverBookingNotification(id, "customer_email");
+}
+
 export async function retryBookingNotifications(limit = 10) {
-  const summary = { attempted: 0, sent: 0, email: 0, whatsapp: 0 };
+  const summary = { attempted: 0, sent: 0, email: 0, whatsapp: 0, customer_email: 0 };
   for (let i = 0; i < limit; i++) {
     const result = await deliverBookingNotification();
     if (!result.attempted) break;

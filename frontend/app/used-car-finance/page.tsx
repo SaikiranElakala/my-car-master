@@ -23,9 +23,9 @@ const financeBenefits = [
 export default function Page() {
   return (
     <>
-      <section aria-labelledby="finance-hero-title" className="relative isolate flex min-h-[calc(100svh-6rem)] items-center overflow-hidden bg-cover bg-center text-ink" style={{ backgroundImage: "url('/images/cars/Golden%20Hour%20Dealership%20Skyline.png')" }}>
+      <section aria-labelledby="finance-hero-title" className="relative isolate flex min-h-[620px] items-center overflow-hidden bg-cover bg-center text-ink md:min-h-[680px]" style={{ backgroundImage: "url('/images/cars/Golden%20Hour%20Dealership%20Skyline.png')" }}>
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/40 to-white/0" />
-        <div className="container-x relative z-10 -translate-y-4 py-28 md:-translate-y-8 md:py-36">
+        <div className="container-x relative z-10 -translate-y-4 py-16 md:-translate-y-8 md:py-24">
           <div className="mb-5"><BackButton href="/" className="!mb-0 text-steel hover:text-ink" /></div>
           <p className="eyebrow inline-flex rounded-full bg-white/75 px-4 py-2 text-amber-deep shadow-sm">Used car finance</p>
           <h1 id="finance-hero-title" className="display mt-6 max-w-2xl text-5xl md:text-7xl">Finance for your <span className="text-amber">used car.</span></h1>
@@ -57,9 +57,8 @@ export default function Page() {
             ))}
           </ul>
           <div className="mx-auto mt-12 max-w-3xl">
-            <EnquiryForm kind="finance" submitLabel="Send finance enquiry" fields={[
+            <EnquiryForm kind="finance" submitLabel="Send finance enquiry" showCityArea fields={[
               { name: "vehicle", label: "Vehicle you plan to buy" },
-              { name: "city", label: "City" },
             ]} />
           </div>
         </div>

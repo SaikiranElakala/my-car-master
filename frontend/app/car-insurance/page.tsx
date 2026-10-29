@@ -22,7 +22,7 @@ const insuranceBenefits = [
 export default function Page() {
   return (
     <>
-      <PageHero eyebrow="Car insurance" title="Insurance," accent="questions?" lead="Send an enquiry about a policy, renewal or claim. The team will follow up to confirm current availability and next steps." ctaLabel="Send enquiry" ctaHref="#enquiry" backgroundImage="/images/cars/Modern SUV Insurance Protection Scene.png" showBackButton liftContent />
+      <PageHero eyebrow="Car insurance" title="Insurance," accent="questions?" lead="Send an enquiry about a policy, renewal or claim. The team will follow up to confirm current availability and next steps." ctaLabel="Send enquiry" ctaHref="#enquiry" backgroundImage="/images/cars/Modern SUV Insurance Protection Scene.png" showBackButton liftContent compact />
       <TextSplit title="Choose an enquiry topic">
         <ul className="list-disc space-y-2 pl-5"><li>New car insurance</li><li>Used car insurance</li><li>Renewal</li><li>Claim assistance</li></ul>
         <p>This form sends your enquiry to My Car Master. The team will confirm whether assistance is currently available. Insurers determine policy terms, premiums and claim decisions.</p>
@@ -46,7 +46,7 @@ export default function Page() {
       <section id="enquiry" className="scroll-mt-28 bg-bone py-20 md:py-28">
         <div className="container-x grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
           <h2 className="display text-4xl md:text-6xl">Insurance enquiry</h2>
-          <EnquiryForm kind="insurance" submitLabel="Send insurance enquiry" fields={[
+          <EnquiryForm kind="insurance" submitLabel="Send insurance enquiry" showCityArea fields={[
             { name: "type", label: "What do you need?", options: ["New car", "Used car", "Renewal", "Claim assistance"], required: true },
             { name: "vehicle", label: "Vehicle (make, model)" },
           ]} />

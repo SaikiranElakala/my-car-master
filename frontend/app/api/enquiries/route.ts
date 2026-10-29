@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { saveCustomerRequest, tryCustomerRequestEmailNow } from "@/lib/customerRequestQueue";
+import { saveCustomerRequest, tryCustomerRequestEmailNow, tryCustomerConfirmationEmailNow } from "@/lib/customerRequestQueue";
 import { readJsonRequest } from "@/lib/readJsonRequest";
 
 export const runtime = "nodejs";
@@ -20,6 +20,7 @@ export async function POST(request: Request) {
   const type = body.kind;
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const phone = typeof body.phone === "string" ? body.phone.replace(/[\s()-]/g, "") : "";
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const rawDetails = body.details;
   if (body.privacyNoticeAcknowledged !== true) {
     return NextResponse.json({ error: "Please review the Privacy Policy and confirm before sending your enquiry." }, { status: 400 });
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
   }
   if (!name || name.length > 120 || /[\u0000-\u001F\u007F]/.test(name) || !/^[6-9]\d{9}$/.test(phone)) {
     return NextResponse.json({ error: "Please enter your name and a valid 10-digit Indian mobile number." }, { status: 400 });
+  }
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Please enter a valid email address for your confirmation." }, { status: 400 });
   }
   if (!rawDetails || typeof rawDetails !== "object" || Array.isArray(rawDetails)) {
     return NextResponse.json({ error: "Invalid enquiry details." }, { status: 400 });
@@ -52,21 +56,35 @@ export async function POST(request: Request) {
   if (type === "insurance" && !details.type) {
     return NextResponse.json({ error: "Please choose the type of insurance help you need." }, { status: 400 });
   }
+  if (type === "contact" && typeof body.serviceName === "string" && body.serviceName.trim()) {
+    const serviceName = body.serviceName.trim();
+    if (serviceName.length > 120 || /[\u0000-\u001F\u007F]/.test(serviceName)) {
+      return NextResponse.json({ error: "Please check your enquiry details and try again." }, { status: 400 });
+    }
+    details.serviceName = serviceName;
+  }
   details.privacyNoticeAcknowledged = "true";
   const id = randomUUID();
 
   try {
-    await saveCustomerRequest({ id, type: type as EnquiryType, name, phone, details });
+    await saveCustomerRequest({ id, type: type as EnquiryType, name, phone, email, details });
   } catch (error) {
     console.error("Customer enquiry could not be saved:", error);
-    return NextResponse.json({ error: "We couldn't safely save your enquiry. Please try again." }, { status: 503 });
+    const databaseErrorCode = error && typeof error === "object" && "code" in error && typeof error.code === "string"
+      ? error.code
+      : error instanceof Error ? error.name : "unknown";
+    return NextResponse.json({
+      error: "We couldn't safely save your enquiry. Please try again.",
+      ...(process.env.NODE_ENV !== "production" ? { diagnostic: `Database error: ${databaseErrorCode}` } : {}),
+    }, { status: 503 });
   }
 
-  try {
-    await tryCustomerRequestEmailNow(id);
-  } catch (error) {
-    console.error("Immediate enquiry email attempt failed; it remains queued:", error);
-  }
+  const [businessEmailResult, customerEmailResult] = await Promise.allSettled([
+    tryCustomerRequestEmailNow(id),
+    tryCustomerConfirmationEmailNow(id),
+  ]);
+  if (businessEmailResult.status === "rejected") console.error("Immediate enquiry email attempt failed; it remains queued:", businessEmailResult.reason);
+  if (customerEmailResult.status === "rejected") console.error("Immediate customer confirmation email failed; it remains queued:", customerEmailResult.reason);
 
-  return NextResponse.json({ ok: true, reference: id }, { status: 202 });
+  return NextResponse.json({ ok: true, reference: id, customerEmailSent: customerEmailResult.status === "fulfilled" && customerEmailResult.value.sent }, { status: 202 });
 }

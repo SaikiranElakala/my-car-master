@@ -13,7 +13,7 @@ export function PrivacyPolicyContent() {
         <p className="mt-2">We may collect the following information when you book or use our services:</p>
         <ul className="mt-3 list-disc space-y-2 pl-6 marker:text-amber">
           <li>Customer name and contact number.</li>
-          <li>Email address, where provided.</li>
+          <li>Email address for request confirmations and service follow-up.</li>
           <li>Vehicle details, including registration number, make, model, and variant.</li>
           <li>Dealership name, vehicle location, and scheduled inspection date.</li>
           <li>Vehicle photographs, inspection reports, and related service records.</li>
@@ -28,6 +28,7 @@ export function PrivacyPolicyContent() {
           <li>To schedule and conduct vehicle inspections.</li>
           <li>To prepare and share PDI reports, photographs, and inspection findings.</li>
           <li>To communicate with customers regarding bookings, updates, and service completion.</li>
+          <li>To send a receipt confirming that a service request was received.</li>
           <li>To process payments, maintain business records, and provide customer support.</li>
           <li>To improve our services and meet applicable legal obligations.</li>
         </ul>

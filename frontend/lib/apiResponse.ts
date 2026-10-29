@@ -6,7 +6,11 @@ export async function readApiResponse(response: Response, fallback: string) {
     : {};
 
   if (!response.ok) {
-    throw new Error(typeof body.error === "string" ? body.error : fallback);
+    const message = typeof body.error === "string" ? body.error : fallback;
+    const diagnostic = process.env.NODE_ENV !== "production" && typeof body.diagnostic === "string"
+      ? ` (${body.diagnostic})`
+      : "";
+    throw new Error(`${message}${diagnostic}`);
   }
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new Error(fallback);

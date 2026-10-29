@@ -20,7 +20,7 @@ export default function Page() {
   return (
     <>
       <PageHero urgent eyebrow="Roadside assistance" title="Need help" accent="on the road?" lead="Send a request and tell us where you are and what happened. The team can follow up to confirm availability and next steps."
-        ctaLabel="Request assistance" ctaHref="#request" secondary={client.phone ? { label: "Call now", href: phoneHref() } : undefined} backgroundImage="/images/cars/Roadside Assistance at Golden Hour.png" showBackButton liftContent />
+        ctaLabel="Request assistance" ctaHref="#request" secondary={client.phone ? { label: "Call now", href: phoneHref() } : undefined} backgroundImage="/images/cars/Roadside Assistance at Golden Hour.png" showBackButton liftContent compact />
       <section className="py-16 md:py-24">
         <div className="container-x">
           <div className="grid gap-3 sm:grid-cols-3">
@@ -40,9 +40,8 @@ export default function Page() {
       <section id="request" className="scroll-mt-28 bg-bone py-20 md:py-28">
         <div className="container-x grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
           <h2 className="display text-4xl md:text-6xl">Request assistance</h2>
-          <EnquiryForm kind="roadside" submitLabel="Request assistance" fields={[
+          <EnquiryForm kind="roadside" submitLabel="Request assistance" showCityArea fields={[
             { name: "type", label: "What happened?", options: cats.map(([, l]) => l), required: true },
-            { name: "location", label: "Your location", required: true },
             { name: "vehicle", label: "Vehicle (make, model)" },
           ]} />
         </div>

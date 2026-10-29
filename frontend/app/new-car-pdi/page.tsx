@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <section className="relative isolate flex min-h-[calc(100svh-6rem)] items-center overflow-hidden bg-ink bg-cover bg-center pb-16 pt-32 text-white md:pb-24 md:pt-40" style={{ backgroundImage: "url('/images/cars/Sunset%20Car%20Inspection%20at%20the%20Dealership.png')" }}>
+      <section className="relative isolate flex min-h-[620px] items-center overflow-hidden bg-ink bg-cover bg-center pb-12 pt-28 text-white md:min-h-[680px] md:pb-16 md:pt-32" style={{ backgroundImage: "url('/images/cars/Sunset%20Car%20Inspection%20at%20the%20Dealership.png')" }}>
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/40 to-ink/5" />
         <div className="container-x relative z-10">
           <p className="eyebrow text-amber">New Car PDI Inspection</p>

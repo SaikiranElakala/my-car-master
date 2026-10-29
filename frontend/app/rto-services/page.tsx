@@ -23,7 +23,7 @@ const rtoServices = [
 export default function Page() {
   return (
     <>
-      <PageHero eyebrow="Additional service - RTO assistance" title="RTO services," accent="made simpler." lead="Get assistance with common vehicle and driving document requests. Tell us what you need and the team will confirm the process, availability and applicable charges." ctaLabel="Request RTO assistance" ctaHref="#enquiry" secondary={{ label: "View RTO services", href: "#rto-service-list" }} backgroundImage="/images/cars/Modern%20RTO%20Registration%20Office%20Scene.png" />
+      <PageHero eyebrow="Additional service - RTO assistance" title="RTO services," accent="made simpler." lead="Get assistance with common vehicle and driving document requests. Tell us what you need and the team will confirm the process, availability and applicable charges." ctaLabel="Request RTO assistance" ctaHref="#enquiry" secondary={{ label: "View RTO services", href: "#rto-service-list" }} backgroundImage="/images/cars/Modern%20RTO%20Registration%20Office%20Scene.png" showBackButton backHref="/#services" compact />
       <section id="rto-service-list" className="scroll-mt-28 bg-bone py-16 md:py-24">
         <div className="container-x">
           <div className="max-w-2xl">

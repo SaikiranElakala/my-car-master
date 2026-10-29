@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { saveCustomerRequest, tryBookingEmailNow } from "@/lib/customerRequestQueue";
+import { saveCustomerRequest, tryBookingEmailNow, tryCustomerConfirmationEmailNow } from "@/lib/customerRequestQueue";
 import { readJsonRequest } from "@/lib/readJsonRequest";
 import { locationGroups } from "@/config/locations";
 import { vehicleTypes } from "@/config/vehicleTypes";
@@ -45,6 +45,10 @@ export async function POST(request: Request) {
   }
 
   const booking = Object.fromEntries(requiredFields.map((field) => [field, (values[field] as string).trim()])) as Record<typeof requiredFields[number], string>;
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Please enter a valid email address for your confirmation." }, { status: 400 });
+  }
   const vehicleType = typeof body.vehicleType === "string" ? body.vehicleType.trim() : "";
   if (vehicleType && !vehicleTypes.some((type) => type === vehicleType)) {
     return NextResponse.json({ error: "Please select a listed vehicle type or leave it blank." }, { status: 400 });
@@ -68,6 +72,7 @@ export async function POST(request: Request) {
       type: "booking",
       name: booking.name,
       phone: booking.phone,
+      email,
       details: {
         city: booking.city,
         area: booking.area,
@@ -81,15 +86,19 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Booking could not be saved:", error);
-    return NextResponse.json({ error: "We couldn't safely save your request. Please try again." }, { status: 503 });
+    const databaseErrorCode = error && typeof error === "object" && "code" in error && typeof error.code === "string"
+      ? error.code
+      : error instanceof Error ? error.name : "unknown";
+    return NextResponse.json({
+      error: "We couldn't safely save your request. Please try again.",
+      ...(process.env.NODE_ENV !== "production" ? { diagnostic: `Database error: ${databaseErrorCode}` } : {}),
+    }, { status: 503 });
   }
 
-  // Try email immediately; the database-backed job remains available to the retry worker on failure.
-  try {
-    await tryBookingEmailNow(id);
-  } catch (error) {
-    console.error("Immediate booking email attempt failed; it remains queued:", error);
-  }
+  // Try notifications immediately; database-backed jobs remain available to the retry worker.
+  const [emailResult, customerEmailResult] = await Promise.allSettled([tryBookingEmailNow(id), tryCustomerConfirmationEmailNow(id)]);
+  if (emailResult.status === "rejected") console.error("Immediate booking email attempt failed; it remains queued:", emailResult.reason);
+  if (customerEmailResult.status === "rejected") console.error("Immediate customer confirmation email failed; it remains queued:", customerEmailResult.reason);
 
-  return NextResponse.json({ ok: true, reference: id }, { status: 202 });
+  return NextResponse.json({ ok: true, reference: id, customerEmailSent: customerEmailResult.status === "fulfilled" && customerEmailResult.value.sent }, { status: 202 });
 }
